@@ -1,7 +1,7 @@
 ## 资源加载器
 
 ### demo
-演示地址：[r-loader演示](https://xiangwenhu.github.io/rloader/)
+演示地址：<a href="https://xiangwenhu.github.io/rloader/" target="_blank">r-loader演示</a> 
 ```js
 const resourcesInfo = [{
     pre: ["promise"],
