@@ -23,20 +23,26 @@ const resourcesInfo = [{
 }];
 
 
-const rl = new ResourceLoader(resourcesInfo);
+let startTime;
+
+const rl = new ResourceLoader(resourcesInfo, idb);
 
 rl.on("progress", (progress, info)=>{
-    console.log("progress", progress,  info);
+    console.log("progress:", progress,  info);
+});
+
+rl.on("completed", (datas)=>{
+    console.log("completed event:", datas);    
+    console.log("total time:", Date.now() - startTime)
 });
 
 rl.on("loaded", (datas)=>{
-    console.log("loaded event", datas);    
+    console.log("loaded event:", datas);    
     console.log("total time:", Date.now() - startTime)
-})
+});
 
 rl.on("error", (error, info)=>{
-    console.log("error event",error, info);
-})
-
+    console.log("error event:", error.message, info);
+});
 
 ```
