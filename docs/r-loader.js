@@ -1,6 +1,6 @@
 function fetchResource(url){
     return fetch(url, {
-         method:"get",
+         method: "get",
          responseType: 'blob'
      }).then(res=>{
          if(res.status >= 400){
@@ -42,17 +42,28 @@ function validateKey(resources){
     return failed;
 }
 
+const noop = ()=>{};
+
+const defaultStorage = {
+    getMany: noop,
+    set: noop,
+    del: noop,
+    get: noop
+};
+
  // status: undefined loading loaded error
 class ResourceLoader {
-    constructor(resourcesInfo, storage = idb){
+    constructor(resourcesInfo, storage = defaultStorage){
         this._originResourcesInfo = resourcesInfo;
         this._storage = storage;
            
         this._events = {
             loaded: [],
             progress: [],
-            error: []
+            error: [],
+            completed: []
         };
+        this.reset();
     }
 
     reset(){
@@ -110,7 +121,11 @@ class ResourceLoader {
         if(!this.isCompleted()){
             return this.fetchResources()
         }
-        this.emit("loaded", this._loaded);
+        this.emit("completed", this._loaded);
+        // 全部正常加载，才触发loaded事件
+        if(this.resourcesInfo.every(r=> r.status === "loaded")){
+            this.emit("loaded", this._loaded);
+        }
     }
 
     getProgress(){
@@ -165,7 +180,21 @@ class ResourceLoader {
         const rInfo = this.resourcesInfo.find(r=> r.key === info.key);
         rInfo.status = "error";        
         this.emit("error", err, info);    
+
+        this.setFactorErrors(info);
         this.nextLoad();  
+    }
+
+    setFactorErrors(info){
+        // 未开始，pre包含info.key
+        const rs = this.resourcesInfo.filter(r=> !r.status && r.pre && r.pre.indexOf(info.key) >= 0);
+        if(rs.length < 0){
+            return;
+        }
+        rs.forEach(r=> {
+            console.warn(`mark ${r.key}(${r.url}) as error because it's pre failed to load`);
+            r.status = "error"
+        });
     }
 
     isPreLoaded(pre){
@@ -209,7 +238,7 @@ class ResourceLoader {
             return;
         }
         if(this.isCompleted()){
-            this.emit("loaded", this._cached);
+            this.emit("completed", this._cached);
         }
         await this.prepare();
         this.fetchResources();
