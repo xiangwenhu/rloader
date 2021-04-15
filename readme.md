@@ -1,5 +1,15 @@
 ## 资源加载器
 
+
+### 序
+service worker是条路, 这也是一条路。 多一条路，多一条选择。
+
+
+### 特点
+1. 资源加载支持简单的依赖关系
+2. 缓存支持版本
+3. 小巧
+
 ### demo
 演示地址：<a href="https://xiangwenhu.github.io/rloader/" target="_blank">r-loader演示</a> 
 ```js
