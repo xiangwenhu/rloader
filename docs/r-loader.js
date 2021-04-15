@@ -1,10 +1,6 @@
- 
- 
  class Emitter{
-
     constructor(){              
-        this._events = {           
-        };
+        this._events = Object.create(null);
     }
 
     emit(type, ...args){
@@ -35,8 +31,7 @@ class ResourceLoader extends Emitter {
     constructor(resourcesInfo, storage = defaultStorage){
         super();
         this._originResourcesInfo = resourcesInfo;
-        this._storage = storage;
-     
+        this._storage = storage;     
         this.reset();
     }
 
@@ -118,7 +113,7 @@ class ResourceLoader extends Emitter {
     }
 
     get(key){
-        return this._loaded[key]  || this.resourcesInfoObj[key];
+        return (this._loaded[key]  || this.resourcesInfoObj[key]).url;
     }
 
 
@@ -163,8 +158,7 @@ class ResourceLoader extends Emitter {
 
     fetchResources(){
         let info = this.findCanLoadResource();
-        while(info){     
-            
+        while(info){                 
             const cache = this._cached[info.key];
 
             // 有缓存

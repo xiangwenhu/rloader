@@ -1,15 +1,37 @@
+class Emitter{
+    constructor(){              
+        this._events = Object.create(null);
+    }
+
+    emit(type, ...args){
+        const events = this._events[type];
+        if(!Array.isArray(events) || events.length  === 0){
+            return;
+        }
+        events.forEach(event=> event.apply(null, args));
+    }
+
+    on(type, fn){
+        const events = this._events[type] || (this._events[type] = []);       
+        events.push(fn)
+    }
+
+    off(type, fn){
+        const events = this._events[type] || (this._events[type] = []);   
+        const index = events.find(f=> f === fn);
+        if(index < -1){
+            return;
+        }
+        events.splice(index, 1);
+    }
+ }
+ 
  // status: undefined loading loaded error
- class ResourceLoader {
+class ResourceLoader extends Emitter {
     constructor(resourcesInfo, storage = defaultStorage){
+        super();
         this._originResourcesInfo = resourcesInfo;
-        this._storage = storage;
-           
-        this._events = {
-            loaded: [],
-            progress: [],
-            error: [],
-            completed: []
-        };
+        this._storage = storage;     
         this.reset();
     }
 
@@ -91,36 +113,9 @@
     }
 
     get(key){
-        return this._loaded[key]  || this.resourcesInfoObj[key];
+        return (this._loaded[key]  || this.resourcesInfoObj[key]).url;
     }
 
-    emit(type, ...args){
-        const events = this._events[type];
-        if(!Array.isArray(events) || events.length  === 0){
-            return;
-        }
-        events.forEach(event=> event.apply(null, args));
-    }
-
-    on(type, fn){
-        const events = this._events[type];
-        if(!Array.isArray(events)){
-            return;
-        }
-        events.push(fn)
-    }
-
-    off(type, fn){
-        const events = this._events[type];
-        if(!Array.isArray(events)){
-            return;
-        }
-        const index = events.find(f=> f === fn);
-        if(index < -1){
-            return;
-        }
-        events.splice(index, 1);
-    }
 
     fetchResource(rInfo){
         return fetchResource(`${rInfo.url}?ver=${rInfo.ver}`)
@@ -163,8 +158,7 @@
 
     fetchResources(){
         let info = this.findCanLoadResource();
-        while(info){     
-            
+        while(info){                 
             const cache = this._cached[info.key];
 
             // 有缓存
@@ -208,6 +202,3 @@
         this.fetchResources();
     }
 }
-
-
-
