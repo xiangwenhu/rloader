@@ -116,6 +116,9 @@ class ResourceLoader extends Emitter {
         return (this._loaded[key]  || this.resourcesInfoObj[key]).url;
     }
 
+    getCacheData(key){
+        return this._storage.get(key)
+    }
 
     fetchResource(rInfo){
         return fetchResource(`${rInfo.url}?ver=${rInfo.ver}`)
@@ -202,3 +205,6 @@ class ResourceLoader extends Emitter {
         this.fetchResources();
     }
 }
+
+
+
