@@ -1,58 +1,5 @@
-function fetchResource(url){
-    return fetch(url, {
-         method: "get",
-         responseType: 'blob'
-     }).then(res=>{
-         if(res.status >= 400){
-             throw new Error(res.status + "," + res.statusText);
-         }
-         return res;
-     }).then(res=> res.blob());
- }  
-
- function copyObject(obj){
-    return  JSON.parse(JSON.stringify(obj));
- }
-
-function generateBlobUrl(blob){
-   return URL.createObjectURL(blob); 
-}
-
-function validateKey(resources){
-    let failed = false;
-    // 空key检查
-    const emptyKeys = resources.filter(r=> r.key == undefined || r.key == "");
-    if(emptyKeys.length > 0){
-        failed = true;
-        console.error("ResourceLoader validateKey: 资源都必须有key");
-        return failed;
-    }
-    // 资源重复检查
-    const results = Object.create(null);
-    resources.forEach(r=>{
-        (results[r.key] = results[r.key]  || []).push(r);
-    });   
-
-    Object.keys(results).forEach(k=>{
-        if(results[k].length > 1){
-            console.error("key " +  k + " 重复了," + results[k].map(r=>r.url).join(","));
-            failed = true;
-        }
-    });    
-    return failed;
-}
-
-const noop = ()=>{};
-
-const defaultStorage = {
-    getMany: noop,
-    set: noop,
-    del: noop,
-    get: noop
-};
-
  // status: undefined loading loaded error
-class ResourceLoader {
+ class ResourceLoader {
     constructor(resourcesInfo, storage = defaultStorage){
         this._originResourcesInfo = resourcesInfo;
         this._storage = storage;
@@ -111,8 +58,13 @@ class ResourceLoader {
 
         this.emit("progress", this.getProgress(), rInfo);
         if(!isCached){
-            rInfo.data = data;
-            this._storage.set(info.key, rInfo);
+            const info = {
+                data,
+                key: rInfo.key,
+                url: rInfo.url,
+                ver: rInfo.ver || ""
+            };
+            this._storage.set(info.key, info);
         }
         this.nextLoad();
     }
@@ -171,14 +123,16 @@ class ResourceLoader {
     }
 
     fetchResource(rInfo){
-        return fetchResource(rInfo.url)
+        return fetchResource(`${rInfo.url}?ver=${rInfo.ver}`)
         .then(blob=> this.onResourceLoaded(rInfo, blob))
         .catch(error =>this.onResourceLoadError(error, rInfo));
     }
 
     onResourceLoadError(err, info){
         const rInfo = this.resourcesInfo.find(r=> r.key === info.key);
-        rInfo.status = "error";        
+        rInfo.status = "error";  
+        
+        console.error(`${info.key}(${info.url}) load error: ${err.message}`);
         this.emit("error", err, info);    
 
         this.setFactorErrors(info);
@@ -209,16 +163,26 @@ class ResourceLoader {
 
     fetchResources(){
         let info = this.findCanLoadResource();
-        while(info){           
-            if(this.isCached(info.key)){
-                console.log(`${info.key} is cached, load from db, pre`, info.pre);
+        while(info){     
+            
+            const cache = this._cached[info.key];
 
-                const data = this._cached[info.key].data;
-                this.onResourceLoaded(info, data, true);
-                info = this.findCanLoadResource();
-                continue;
+            // 有缓存
+            if(cache){
+                const cache = this._cached[info.key];
+                const isOlder = compareVersion(cache.ver, info.ver || "") < 0;
+
+                // 缓存过期
+                if(isOlder){
+                    console.warn(`${info.key} is cached, but is older version, cache:${cache.ver} request: ${info.ver}`);
+                }else {
+                    console.log(`${info.key} is cached, load from db, pre`, info.pre);
+                    this.onResourceLoaded(info, cache.data, true);
+                    info = this.findCanLoadResource();
+                    continue;
+                }
             }
-            console.log(`${info.key} is not cached, load from network ${info.url}, pre`, info.pre);
+            console.log(`${info.key} load from network ${info.url}, pre`, info.pre);
             info.status = "loading";
             this.fetchResource(info);
             info = this.findCanLoadResource();
