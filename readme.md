@@ -17,9 +17,11 @@ service worker是条路, 这也是一条路。 多一条路，多一条选择。
 const resourcesInfo = [{
     pre: ["promise"],
     key: "axios",
+    ver: "1.2",
     url: "https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"
 },{
     key: "mqtt",
+    ver: "1.0",
     url: "https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.2.6/mqtt.min.js"
 },{
     key: "lottie",
