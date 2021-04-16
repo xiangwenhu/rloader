@@ -2,13 +2,13 @@ const resourcesInfo = [
 {
     key: "mqtt",
     url: "https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.2.6/mqtt.min.js",
-    ver: "1.8"
+    ver: "1.9"
 },
 {
     pre: ["promise"],
     key: "axios",
     url: "https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js",
-    ver: "1.3.1"
+    ver: "1.3.2"
 }
 ,{
     key: "lottie",
