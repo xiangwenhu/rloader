@@ -57,13 +57,27 @@ class CacheManager {
     }
 
     set(key, value) {
-        this.storage.set(key, value);
+        return this.storage.set(key, value);
     }
 
     clear() {
         this._cached = Object.create(null);
+        // return this.storage.clear();
+    }
+
+    del(key){
+        delete this._cached[key];
+        // return this.storage.del();
     }
 }
+
+const defaultStorage = {
+    get: noop,
+    getMany: noop,
+    set: noop,
+    del: noop,
+    clear: noop
+};
 
 // status: undefined loading loaded error
 class ResourceLoader extends Emitter {
