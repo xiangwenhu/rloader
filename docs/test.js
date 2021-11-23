@@ -1,44 +1,44 @@
 const resourcesInfo = [
 {
     key: "mqtt",
-    url: "https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.2.6/mqtt.min.js",
-    ver: "1.9"
+    url: "https://cdn.bootcdn.net/ajax/libs/mqtt/4.2.8/mqtt.js",
+    ver: "4.2.8"
 },
 {
     pre: ["promise"],
     key: "axios",
-    url: "https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js",
-    ver: "1.3.2"
+    url: "https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.js",
+    ver: "0.21.1"
 }
 ,{
     key: "lottie",
-    url: "https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.8/lottie.min.js"
+    url: "https://cdn.bootcdn.net/ajax/libs/lottie-web/5.7.12/lottie.js"
 },{
     key: "flv",
-    url: "https://cdnjs.cloudflare.com/ajax/libs/flv.js/1.5.0/flv.min.js"
+    url: "https://cdn.bootcdn.net/ajax/libs/flv.js/1.6.1/flv.js"
 },
 {
     key: "promise",
-    url: "https://cdnjs.cloudflare.com/ajax/libs/promise-polyfill/8.2.0/polyfill.min.js"
-},{
-    pre: "react",
+    url: "https://cdn.bootcdn.net/ajax/libs/es6-promise/4.2.8/es6-promise.auto.js"
+},{   
     key: "react-dom",
-    url: "https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"
+    url: "https://cdn.bootcdn.net/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"
 },{
-    url: "https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js",
+    pre: "react-dom",
+    url: "https://cdn.bootcdn.net/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js",
     key: "react"
 }, {
     key: "react-router",
     pre: ["react", "react-dom"],
-    url: "https://cdnjs.cloudflare.com/ajax/libs/react-router/5.2.0/react-router.min.js"
+    url: "https://cdn.bootcdn.net/ajax/libs/react-router/5.2.0/react-router.js"
 }, {
     key: "redux",
     pre: ["react", "react-dom"],
-    url: "https://cdnjs.cloudflare.com/ajax/libs/redux/4.0.5/redux.min.js"
+    url: "https://cdn.bootcdn.net/ajax/libs/redux/4.1.0/redux.min.js"
 }, {
     key: "react-redux",
     pre: ["react", "react-dom", "redux"],
-    url: "https://cdnjs.cloudflare.com/ajax/libs/react-redux/7.2.3/react-redux.min.js"
+    url: "https://cdn.bootcdn.net/ajax/libs/react-redux/7.2.4/react-redux.min.js"
 }
 ];
 
