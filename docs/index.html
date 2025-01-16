@@ -1,43 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>r-loader演示</title>
     <style>
+      #messages {
+      }
 
-        #messages{
-            height: 500px;
-            overflow-y: auto;
-            outline: solid red 1px;
-        }
-
+      #tbody {
+        height: 500px;
+        overflow-y: auto;
+      }
     </style>
-</head>
+  </head>
 
-<body>
-
-    <div id="messages">
-
-
-    </div>
+  <body>
+    <table id="table">
+      <thead>
+        <tr>
+          <td>key</td>
+          <td>version</td>
+          <td>pre</td>
+          <td>url</td>
+          <td>cached</td>
+          <td>status</td>
+          <td>message</td>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
 
     <div>
-        <button id="btn-load">加载</button>
-        <button id="btn-clear">清除缓存</button>
+      <button id="btn-load">加载</button>
+      <button id="btn-clear">清除缓存</button>
     </div>
+    <div id="messages"></div>
 
     <script src="./idb.js"></script>
     <script src="./util.js"></script>
     <script src="./r-loader.js"></script>
     <script src="./test.js"></script>
-
-
-
-    
-
-</body>
-
+  </body>
 </html>

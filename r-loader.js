@@ -114,7 +114,8 @@ class ResourceLoader extends Emitter {
             url: generateBlobUrl(data)
         };
 
-        this.emit("progress", this.getProgress(), rInfo);
+        this.emit("loaded", rInfo);
+        this.emit("progress", this.getProgress(), rInfo)
         if (!isCached) {
             const info = {
                 data,
@@ -134,7 +135,7 @@ class ResourceLoader extends Emitter {
         this.emit("completed", this._loaded);
         // 全部正常加载，才触发loaded事件
         if (this.resourcesInfo.every(r => r.status === "loaded")) {
-            this.emit("loaded", this._loaded);
+            this.emit("all-loaded", this._loaded);
         }
     }
 
@@ -155,11 +156,14 @@ class ResourceLoader extends Emitter {
     getCacheData(key) {
         return this._cacheManager.get(key)
     }
+     
 
-    fetchResource(rInfo) {
-        return fetchResource(`${rInfo.url}?ver=${rInfo.ver}`)
-            .then(blob => this.onResourceLoaded(rInfo, blob))
-            .catch(error => this.onResourceLoadError(error, rInfo));
+    fetchResource(info) {
+        const url = getUrlWithVersion(info);
+        this.emit("loading", info)
+        return fetchResource(url)
+            .then(blob => this.onResourceLoaded(info, blob))
+            .catch(error => this.onResourceLoadError(error, info));
     }
 
     onResourceLoadError(err, info) {
@@ -167,6 +171,7 @@ class ResourceLoader extends Emitter {
         rInfo.status = "error";
 
         console.error(`${info.key}(${info.url}) load error: ${err.message}`);
+        this.emit("progress", this.getProgress(), info)
         this.emit("error", err, info);
 
         // 因被依赖，会导致其他依赖他的资源为失败
@@ -222,7 +227,7 @@ class ResourceLoader extends Emitter {
         }
     }
 
-    prepare() {
+    getCacheInfos() {
         const keys = this.resourcesInfo.map(r => r.key);
         return this._cacheManager.load(keys);
     }
@@ -235,7 +240,7 @@ class ResourceLoader extends Emitter {
         if (this.isCompleted()) {
             this.emit("completed", this._cacheManager.datas);
         }
-        this.prepare()
+        this.getCacheInfos()
             .then(() => this.fetchResources())
             .catch(err=> this.emit("error", err));
     }

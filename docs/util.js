@@ -46,7 +46,6 @@ function compareVersion(v1 = "", v2 = "") {
     if(v1 == v2){
         return 0;
     }
-
     const version1 = v1.split('.')
     const version2 = v2.split('.')
     const len = Math.max(version1.length, version2.length);
@@ -70,3 +69,11 @@ function compareVersion(v1 = "", v2 = "") {
 }
 
 const noop = ()=>{};
+
+
+function getUrlWithVersion(resource){
+    if(typeof resource.ver !== 'string'){
+        return resource.url
+    }
+    return `${resource.url}?ver=${resource.ver}`
+}

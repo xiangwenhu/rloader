@@ -8,7 +8,7 @@
         "editor.defaultFormatter": "vscode.typescript-language-features"
     },
     "editor.codeActionsOnSave": {
-        "source.fixAll.eslint": true
+        "source.fixAll.eslint": "explicit"
     },
     "terminal.integrated.shell.windows": "cmd.exe",
     "editor.wordWrap": "on",

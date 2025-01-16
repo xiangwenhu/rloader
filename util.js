@@ -69,3 +69,11 @@ function compareVersion(v1 = "", v2 = "") {
 }
 
 const noop = ()=>{};
+
+
+function getUrlWithVersion(resource){
+    if(typeof resource.ver !== 'string'){
+        return resource.url
+    }
+    return `${resource.url}?ver=${resource.ver}`
+}
