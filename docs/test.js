@@ -1,44 +1,44 @@
 const resourcesInfo = [
     {
         key: "mqtt",
-        url: "https://cdn.bootcdn.net/ajax/libs/mqtt/4.2.8/mqtt.js",
+        url: "https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.10.3/mqtt.min.js",
         ver: "4.2.8"
     },
     {
         pre: ["promise"],
         key: "axios",
-        url: "https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.js",
+        url: "https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.8/axios.min.js",
         ver: "0.21.1"
     }
     , {
         key: "lottie",
-        url: "https://cdn.bootcdn.net/ajax/libs/lottie-web/5.7.12/lottie.js"
+        url: "https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"
     }, {
         key: "flv",
-        url: "https://cdn.bootcdn.net/ajax/libs/flv.js/1.6.2/flv.min.js"
+        url: "https://cdnjs.cloudflare.com/ajax/libs/flv.js/1.6.2/flv.min.js"
     },
     {
         key: "promise",
-        url: "https://cdn.bootcdn.net/ajax/libs/es6-promise/4.2.8/es6-promise.auto.js"
+        url: "https://cdnjs.cloudflare.com/ajax/libs/es6-promise/4.2.8/es6-promise.min.js"
     }, {
         key: "react-dom",
-        url: "https://cdn.bootcdn.net/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"
+        url: "https://cdnjs.cloudflare.com/ajax/libs/react-dom/19.0.0/cjs/react-dom.production.min.js"
     }, {
         pre: "react-dom",
-        url: "https://cdn.bootcdn.net/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js",
+        url: "https://cdnjs.cloudflare.com/ajax/libs/react/19.0.0/cjs/react.production.min.js",
         key: "react"
     }, {
         key: "react-router",
         pre: ["react", "react-dom"],
-        url: "https://cdn.bootcdn.net/ajax/libs/react-router/5.2.0/react-router.js"
+        url: "https://cdnjs.cloudflare.com/ajax/libs/react-router/6.28.1/react-router.production.min.js"
     }, {
         key: "redux",
         pre: ["react", "react-dom"],
-        url: "https://cdn.bootcdn.net/ajax/libs/redux/4.1.0/redux.min.js"
+        url: "https://cdnjs.cloudflare.com/ajax/libs/redux/5.0.1/redux.legacy-esm.js"
     }, {
         key: "react-redux",
         pre: ["react", "react-dom", "redux"],
-        url: "https://cdn.bootcdn.net/ajax/libs/react-redux/7.2.4/react-redux.min.js"
+        url: "https://cdnjs.cloudflare.com/ajax/libs/react-redux/9.2.0/react-redux.mjs"
     }
 ];
 
@@ -72,6 +72,17 @@ const statusMap = {
     4: "下载失败"
 }
 
+
+function getStatusHtml(r) {
+
+    if (r.status == 2) {
+        return `<img src="./images/loading.gif"></img>`
+    }
+
+    return statusMap[r.status] || ''
+}
+
+
 function renderTable(resources) {
     const htmlStr = resources.map(r => `
         <tr>
@@ -80,7 +91,7 @@ function renderTable(resources) {
             <td>${Array.isArray(r.pre) ? r.pre.join(",") : ""}</td>
             <td>${r.url}</td>
             <td>${r.cached ? "yes" : "no"}</td>
-            <td>${statusMap[r.status] || ''}</td>
+            <td>${getStatusHtml(r)}</td>
             <td>${r.message || ''}</td>
         </tr>
         `).join("");
@@ -112,17 +123,13 @@ listenConsole();
 let startTime;
 
 
-
-function getStausText() {
-
-}
-
-
 ; (async function init() {
 
-    const rl = new ResourceLoader(resourcesInfo, idb);
+    const loader = new ResourceLoader(resourcesInfo, idb);
 
-    const cachedDatas = await rl.getCacheInfos();
+    s_total.innerHTML = resourcesInfo.length;
+
+    const cachedDatas = await loader.getCacheInfos();
 
     const eInfos = resourcesInfo.map(r => {
         const cached = !!cachedDatas[r.key]
@@ -141,12 +148,13 @@ function getStausText() {
         if (!item) return;
         item.status = info.status;
         item.message = info.message;
+        item.cached = info.cached;
         renderTable(eInfos);
     }
 
 
 
-    rl.on("loading", (info) => {
+    loader.on("loading", (info) => {
         console.log("loading:", info);
         updateInfo({
             ...info,
@@ -154,25 +162,36 @@ function getStausText() {
         })
     });
 
-    rl.on("loaded", (progress, info) => {
-        console.log("loaded:", progress, info);
+    loader.on("loaded", (info) => {
+        console.log("loaded:", info);
         updateInfo({
             ...info,
-            status: 3
+            status: 3,
+            cached: true
         })
     });
 
-    rl.on("completed", (datas) => {
-        console.log("completed event:", datas);
-        console.log("total time:", Date.now() - startTime)
+
+    loader.on("progress", (progress, info) => {
+        console.log("progress:", progress, info);
+        s_success.innerHTML = progress.loaded;
     });
 
-    rl.on("all-loaded", (datas) => {
+
+    loader.on("completed", (datas) => {
+        console.log("completed event:", datas);
+        cost = Date.now() - startTime;
+        console.log("total time:", cost)
+
+        s_cost.innerHTML = `${cost} ms`
+    });
+
+    loader.on("all-loaded", (datas) => {
         console.log("loaded event:", datas);
         console.log("total time:", Date.now() - startTime)
     });
 
-    rl.on("error", (error, info) => {
+    loader.on("error", (error, info) => {
         console.log("error event:", error.message, info);
         updateInfo({
             ...info,
@@ -184,13 +203,14 @@ function getStausText() {
     addEvent("#btn-load", "click", () => {
         messager.clear();
         startTime = Date.now();
-        rl.reset();
-        rl.startLoad();
+        loader.reset();
+        loader.startLoad();
     });
 
 
     addEvent("#btn-clear", "click", () => {
         window.idb.clear();
+        location.reload();
     });
 
 

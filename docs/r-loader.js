@@ -65,7 +65,7 @@ class CacheManager {
         // return this.storage.clear();
     }
 
-    del(key){
+    del(key) {
         delete this._cached[key];
         // return this.storage.del();
     }
@@ -79,12 +79,18 @@ const defaultStorage = {
     clear: noop
 };
 
+const defaultStartOptions = {
+    concurrent: 5
+}
+
 // status: undefined loading loaded error
 class ResourceLoader extends Emitter {
     constructor(resourcesInfo, storage = defaultStorage) {
         super();
+        this.processing = false;
         this._originResourcesInfo = resourcesInfo;
         this._cacheManager = new CacheManager(storage);
+        this.startOptions = defaultStartOptions;
         this.reset();
     }
 
@@ -156,7 +162,7 @@ class ResourceLoader extends Emitter {
     getCacheData(key) {
         return this._cacheManager.get(key)
     }
-     
+
 
     fetchResource(info) {
         const url = getUrlWithVersion(info);
@@ -175,7 +181,7 @@ class ResourceLoader extends Emitter {
         this.emit("error", err, info);
 
         // 因被依赖，会导致其他依赖他的资源为失败
-        this.setFactorErrors(info); 
+        this.setFactorErrors(info);
         this.nextLoad();
     }
 
@@ -224,7 +230,9 @@ class ResourceLoader extends Emitter {
             info.status = "loading";
             this.fetchResource(info);
             info = this.findCanLoadResource();
+
         }
+
     }
 
     getCacheInfos() {
@@ -232,7 +240,10 @@ class ResourceLoader extends Emitter {
         return this._cacheManager.load(keys);
     }
 
-    startLoad() {
+    startLoad(options) {
+
+        if (this.processing) return;
+
         const failed = validateKey(this.resourcesInfo);
         if (failed) {
             return;
@@ -240,9 +251,10 @@ class ResourceLoader extends Emitter {
         if (this.isCompleted()) {
             this.emit("completed", this._cacheManager.datas);
         }
+
         this.getCacheInfos()
             .then(() => this.fetchResources())
-            .catch(err=> this.emit("error", err));
+            .catch(err => this.emit("error", err));
     }
 }
 

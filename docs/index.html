@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="./index.css" rel="stylesheet" type="text/css">
     <title>r-loader演示</title>
     <style>
       #messages {
@@ -32,6 +33,10 @@
       <tbody id="tbody"></tbody>
     </table>
 
+    <div style="margin: 8px;">
+        概览： 
+        总数：<span id="s_total"></span>，成功加载<span id="s_success">0</span>, 失败<span id="s_failed">0</span>，总开销：<span id="s_cost">0ms</span>
+    </div>
     <div>
       <button id="btn-load">加载</button>
       <button id="btn-clear">清除缓存</button>

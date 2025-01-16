@@ -64,3 +64,8 @@ rl.on("error", (error, info)=>{
 });
 
 ```
+
+
+## TODO::
+1. 并发数量
+2. appId独有和共享资源
