@@ -76,7 +76,7 @@ const statusMap = {
 function getStatusHtml(r) {
 
     if (r.status == 2) {
-        return `<img src="./images/loading.gif"></img>`
+        return `<img src="./images/loading.gif" class='img-loading'></img>`
     }
 
     return statusMap[r.status] || ''

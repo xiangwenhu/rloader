@@ -24,3 +24,17 @@ table {
   tr:hover {
     background-color: #f1f1f1; /* 当鼠标悬停在行上时改变背景色 */
   }
+
+  .img-loading{
+    height: 16px;
+  }
+
+  #s_success{
+    color: green;
+  }
+
+
+  #s_cost{
+    color: blue;
+  }
+
